@@ -12,7 +12,7 @@ contract Verifier is EIP712 {
 
     address public recipient;
 
-    constructor(address _recipient) EIP712("Test", "0.0.1") {
+    constructor(address _recipient) EIP712("recipientOrderProtoType", "0.0.1") {
         recipient = _recipient;
     }
 
