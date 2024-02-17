@@ -17,8 +17,6 @@ contract Verifier is EIP712 {
     }
 
     function execute(RecipientOrder calldata _recipientOrder) external view returns (bool) {
-        // decode
-        // (address to, uint256 amount, uint256 id) = abi.decode(_recipientOrder.order, (address, uint256, uint256));
         RecipientOrderDetail memory orderDetail = abi.decode(_recipientOrder.order, (RecipientOrderDetail));
 
         bytes32 digest = _hashTypedDataV4(
