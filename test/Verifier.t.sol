@@ -4,7 +4,7 @@ pragma solidity ^0.8.13;
 import {Test, console2} from "forge-std/Test.sol";
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {Verifier} from "../src/Verifier.sol";
-import {RecipientOrder} from "../src/OrderStructs.sol";
+import {RecipientOrder, RecipientOrderDetail} from "../src/OrderStructs.sol";
 
 contract MockVerifier is Verifier {
     constructor(address _recipient) Verifier(_recipient) {}
@@ -21,12 +21,6 @@ contract MockVerifier is Verifier {
             )
         );
     }
-}
-
-struct RecipientOrderDetail {
-    address to;
-    uint256 amount;
-    uint256 id;
 }
 
 contract VeriferTest is Test {
@@ -68,7 +62,8 @@ contract VeriferTest is Test {
     function test_execute_return_false_if_other_signature_given() public {
         RecipientOrder memory recipientOrder = _getRecipientOrder(to, DEAFULT_AMOUNT, DEFAULT_ID, recipientPrivateKey);
 
-        RecipientOrder memory recipientOrderWithOther = _getRecipientOrder(to, DEAFULT_AMOUNT, DEFAULT_ID, otherPrivateKey);
+        RecipientOrder memory recipientOrderWithOther =
+            _getRecipientOrder(to, DEAFULT_AMOUNT, DEFAULT_ID, otherPrivateKey);
         recipientOrder.signature = recipientOrderWithOther.signature;
 
         bool result = verifier.execute(recipientOrder);
@@ -86,7 +81,7 @@ contract VeriferTest is Test {
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(_recipientPrivateKey, digest);
         bytes memory signature = abi.encodePacked(r, s, v);
 
-        bytes memory order = abi.encode(_to, _amount, _id);
+        bytes memory order = abi.encode(recipientOrderDetail);
 
         return RecipientOrder({order: order, signature: signature});
     }

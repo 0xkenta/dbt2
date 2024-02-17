@@ -4,7 +4,7 @@ pragma solidity 0.8.23;
 
 import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import {RecipientOrder} from "./OrderStructs.sol";
+import {RecipientOrder, RecipientOrderDetail} from "./OrderStructs.sol";
 
 contract Verifier is EIP712 {
     bytes32 internal constant RECIPIENT_ORDER_DETAIL_TYPEHASH =
@@ -18,9 +18,12 @@ contract Verifier is EIP712 {
 
     function execute(RecipientOrder calldata _recipientOrder) external view returns (bool) {
         // decode
-        (address to, uint256 amount, uint256 id) = abi.decode(_recipientOrder.order, (address, uint256, uint256));
+        // (address to, uint256 amount, uint256 id) = abi.decode(_recipientOrder.order, (address, uint256, uint256));
+        RecipientOrderDetail memory orderDetail = abi.decode(_recipientOrder.order, (RecipientOrderDetail));
 
-        bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(RECIPIENT_ORDER_DETAIL_TYPEHASH, to, amount, id)));
+        bytes32 digest = _hashTypedDataV4(
+            keccak256(abi.encode(RECIPIENT_ORDER_DETAIL_TYPEHASH, orderDetail.to, orderDetail.amount, orderDetail.id))
+        );
 
         address signer = ECDSA.recover(digest, _recipientOrder.signature);
 
